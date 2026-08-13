@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logConsulta } from '@/lib/d1';
+import { extraerCamposConsolidados } from '@/lib/rui-fields';
 
 async function verifyTurnstileToken(
   token: string,
@@ -74,6 +76,15 @@ export async function POST(request: NextRequest) {
     );
 
     const responseText = await response.text();
+
+    if (response.ok) {
+      try {
+        const campos = extraerCamposConsolidados(responseText);
+        await logConsulta(pTipDoc, pNumDoc, campos);
+      } catch (logError) {
+        console.error('Error registrando consulta en D1:', logError);
+      }
+    }
 
     return new NextResponse(responseText, {
       status: response.status,
