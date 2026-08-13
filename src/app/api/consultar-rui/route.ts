@@ -61,25 +61,16 @@ async function consultarViaRelay(
 
 async function consultarConFallback(body: string): Promise<Response> {
   const relayUrl = process.env.RUI_RELAY_URL;
-  let directError: unknown = null;
 
-  try {
-    return await consultarDNP(body);
-  } catch (error) {
-    directError = error;
-    console.error('DNP directo falló:', error);
+  if (relayUrl) {
+    try {
+      return await consultarViaRelay(relayUrl, body);
+    } catch (error) {
+      console.error('Relay falló, intentando directo:', error);
+    }
   }
 
-  if (!relayUrl) {
-    throw directError;
-  }
-
-  try {
-    return await consultarViaRelay(relayUrl, body);
-  } catch (error) {
-    console.error('Relay falló:', error);
-    throw error;
-  }
+  return consultarDNP(body);
 }
 
 export async function POST(request: NextRequest) {
