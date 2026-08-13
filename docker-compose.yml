@@ -1,0 +1,25 @@
+services:
+  relay:
+    build:
+      context: ./relay
+    container_name: rui-relay
+    ports:
+      - "3001:3001"
+    environment:
+      RELAY_SKIP_DIRECT: "0"
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+    container_name: rui-app
+    ports:
+      - "3000:3000"
+    env_file: .env
+    environment:
+      RUI_RELAY_URL: http://relay:3001/Home/ObtenerDatosRUI
+    depends_on:
+      - relay
+    restart: unless-stopped

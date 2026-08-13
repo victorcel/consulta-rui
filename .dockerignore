@@ -1,0 +1,11 @@
+node_modules
+.next
+.open-next
+.wrangler
+.git
+d1
+docs
+*.log
+dev.log
+server.log
+.env

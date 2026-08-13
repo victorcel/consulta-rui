@@ -1,7 +1,7 @@
 # Registro de consultas RUI en Cloudflare D1
 
 **Fecha**: 2026-08-13
-**Estado**: Aprobado
+**Estado**: Superseded — el alcance creció a migración completa de hosting. Ver [`2026-08-13-cloudflare-workers-migration-design.md`](./2026-08-13-cloudflare-workers-migration-design.md), que reemplaza el mecanismo de acceso a D1 (binding nativo en vez de API REST) y el resto de este documento.
 
 ## Contexto
 

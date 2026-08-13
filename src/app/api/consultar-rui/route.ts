@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logConsulta } from '@/lib/d1';
 import { extraerCamposConsolidados } from '@/lib/rui-fields';
 
+const DNP_URL = 'https://ventanillasocial.dnp.gov.co/Home/ObtenerDatosRUI';
+const DIRECT_TIMEOUT_MS = 10000;
+const RELAY_TIMEOUT_MS = 18000;
+
 async function verifyTurnstileToken(
   token: string,
   remoteIp: string | null
@@ -22,7 +26,7 @@ async function verifyTurnstileToken(
       'https://challenges.cloudflare.com/turnstile/v0/siteverify',
       { method: 'POST', body: verifyForm }
     );
-    const verifyData = await verifyResponse.json();
+    const verifyData = (await verifyResponse.json()) as { success?: boolean };
     return verifyData.success === true;
   } catch (error) {
     console.error('Error verificando token de Turnstile:', error);
@@ -30,9 +34,61 @@ async function verifyTurnstileToken(
   }
 }
 
+function crearBodyUrlencoded(pNumDoc: string, pTipDoc: string): string {
+  return new URLSearchParams({ pNumDoc, pTipDoc }).toString();
+}
+
+function consultarDNP(body: string): Promise<Response> {
+  return fetch(DNP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+    signal: AbortSignal.timeout(DIRECT_TIMEOUT_MS),
+  });
+}
+
+async function consultarViaRelay(
+  relayUrl: string,
+  body: string
+): Promise<Response> {
+  return fetch(relayUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+    signal: AbortSignal.timeout(RELAY_TIMEOUT_MS),
+  });
+}
+
+async function consultarConFallback(body: string): Promise<Response> {
+  const relayUrl = process.env.RUI_RELAY_URL;
+  let directError: unknown = null;
+
+  try {
+    return await consultarDNP(body);
+  } catch (error) {
+    directError = error;
+    console.error('DNP directo falló:', error);
+  }
+
+  if (!relayUrl) {
+    throw directError;
+  }
+
+  try {
+    return await consultarViaRelay(relayUrl, body);
+  } catch (error) {
+    console.error('Relay falló:', error);
+    throw error;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as {
+      pNumDoc?: string;
+      pTipDoc?: string;
+      turnstileToken?: string;
+    };
     const { pNumDoc, pTipDoc, turnstileToken } = body;
 
     if (!pNumDoc || !pTipDoc) {
@@ -59,21 +115,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = new FormData();
-    formData.append('pNumDoc', pNumDoc);
-    formData.append('pTipDoc', pTipDoc);
+    const queryBody = crearBodyUrlencoded(pNumDoc, pTipDoc);
 
-    const response = await fetch(
-      'https://ventanillasocial.dnp.gov.co/Home/ObtenerDatosRUI',
-      {
-        method: 'POST',
-        headers: {
-          Cookie:
-            'KEMP_STICKY=3995726526.1.0.2193729874; __CsrfToken=3c01c891099d4759be9ff45940ee2d87',
+    let response: Response;
+    try {
+      response = await consultarConFallback(queryBody);
+    } catch (error) {
+      console.error('Error consultando el DNP:', error);
+      return NextResponse.json(
+        {
+          error:
+            'El servicio del DNP no respondió. Este servicio solo está disponible desde IPs públicas de Colombia. Verifica tu conexión e intenta de nuevo.',
         },
-        body: formData,
-      }
-    );
+        { status: 502 }
+      );
+    }
 
     const responseText = await response.text();
 
