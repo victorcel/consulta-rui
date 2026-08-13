@@ -22,6 +22,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { detectarNivelRui, type NivelRuiInfo } from '@/lib/rui-niveles';
 
 const DOCUMENT_TYPES = [
   { value: '3', label: 'Cédula de ciudadanía' },
@@ -39,6 +41,14 @@ interface RUIField {
   label: string;
   value: string;
 }
+
+// Campos técnicos que devuelve el servicio del RUI pero que no aportan valor
+// al usuario final en el modal de resultado (código de estado interno, el
+// grupo crudo ya se muestra en la tarjeta de nivel, código de municipio).
+const CAMPOS_OCULTOS = new Set(['ok', 'grup rui', 'cod mpio']);
+
+const normalizarEtiqueta = (label: string) =>
+  label.trim().toLowerCase().replace(/\s+/g, ' ');
 
 declare global {
   interface Window {
@@ -59,6 +69,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [resultHtml, setResultHtml] = useState<string | null>(null);
   const [parsedFields, setParsedFields] = useState<RUIField[]>([]);
+  const [nivelInfo, setNivelInfo] = useState<NivelRuiInfo | null>(null);
   const [hasError, setHasError] = useState(false);
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -198,6 +209,7 @@ export default function Home() {
       setIsLoading(true);
       setResultHtml(null);
       setParsedFields([]);
+      setNivelInfo(null);
       setHasError(false);
 
       try {
@@ -226,8 +238,21 @@ export default function Home() {
         }
 
         const fields = parseHtmlResponse(text);
-        setParsedFields(fields);
+        const visibleFields = fields.filter(
+          (field) => !CAMPOS_OCULTOS.has(normalizarEtiqueta(field.label))
+        );
+        setParsedFields(visibleFields);
         setIsResultOpen(true);
+
+        const campoNivel = fields.find((field) =>
+          /grupo|nivel|clasificaci|sisb|rui/i.test(field.label)
+        );
+        const nivel =
+          (campoNivel && detectarNivelRui(campoNivel.value)) ||
+          fields.map((field) => detectarNivelRui(field.value)).find(Boolean) ||
+          detectarNivelRui(text) ||
+          null;
+        setNivelInfo(nivel);
 
         if (fields.length === 0) {
           toast({
@@ -420,6 +445,40 @@ export default function Home() {
                     Información encontrada en el Registro Único de Ingreso
                   </DialogDescription>
                 </DialogHeader>
+                {nivelInfo && (
+                  <div
+                    className={`rounded-lg border bg-gradient-to-br p-4 space-y-3 ${nivelInfo.colorClass}`}
+                  >
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="outline" className="border-current text-current text-sm px-2.5 py-1">
+                        Nivel {nivelInfo.codigo}
+                      </Badge>
+                      <span className="text-sm font-semibold">{nivelInfo.titulo}</span>
+                    </div>
+                    <p className="text-xs text-[#cbd5e1] leading-relaxed">
+                      {nivelInfo.descripcion}
+                    </p>
+                    <div>
+                      <p className="text-xs font-medium text-[#e2e8f0] mb-1.5">
+                        Beneficios a los que normalmente puedes aplicar:
+                      </p>
+                      <ul className="space-y-1">
+                        {nivelInfo.beneficios.map((beneficio, i) => (
+                          <li key={i} className="text-xs text-[#cbd5e1] flex items-start gap-1.5">
+                            <span className="mt-1 w-1 h-1 rounded-full bg-current shrink-0" />
+                            {beneficio}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <p className="text-[10px] text-[#94a3b8] leading-relaxed border-t border-white/10 pt-2">
+                      Información referencial. El RUI clasifica hogares; cada entidad y
+                      programa social define sus propios requisitos de acceso. Confirma tu
+                      elegibilidad en el DNP o la entidad responsable del programa.
+                    </p>
+                  </div>
+                )}
+
                 <div className="rounded-lg border border-[#1e293b] overflow-hidden">
                   {parsedFields.map((field, index) => (
                     <div

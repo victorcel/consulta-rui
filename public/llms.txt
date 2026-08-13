@@ -1,0 +1,27 @@
+# Consulta RUI
+
+> Servicio web gratuito para consultar información en el Registro Único de Ingreso (RUI) del Departamento Nacional de Planeación (DNP) de Colombia.
+
+Consulta RUI permite a cualquier ciudadano colombiano verificar su estado en el Registro Único de Ingreso ingresando su tipo y número de documento de identidad. El resultado se muestra al instante en pantalla.
+
+## Sobre el servicio
+
+- Público objetivo: ciudadanos colombianos que necesitan consultar su registro en el RUI.
+- Entrada requerida: tipo de documento (cédula de ciudadanía, tarjeta de identidad, registro civil, cédula de extranjería, DNI, pasaporte, salvoconducto de refugiado, permiso especial o de protección temporal) y número de documento.
+- Costo: gratuito.
+- Verificación: protegido con Cloudflare Turnstile para prevenir abuso automatizado.
+- Idioma: español (es-CO).
+
+## Páginas
+
+- [Consulta RUI](https://consultarui.col0.com/): página principal con el formulario de consulta.
+
+## Notas para agentes y crawlers
+
+- Este sitio no requiere autenticación para consultar información pública del RUI.
+- El envío del formulario requiere completar un desafío de verificación humana (Turnstile); los agentes automatizados no pueden completar consultas mediante scraping directo del endpoint.
+- No se debe usar este sitio para consultar documentos de identidad de terceros sin su autorización.
+
+## Desarrollado por
+
+[col0](https://col0.com) — IoT, telecomunicaciones y desarrollo de software a la medida.
