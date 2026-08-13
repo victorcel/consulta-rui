@@ -6,6 +6,8 @@ services:
     environment:
       RELAY_SKIP_DIRECT: "0"
     restart: unless-stopped
+    networks:
+      - rui-net
 
   app:
     build:
@@ -13,10 +15,19 @@ services:
       args:
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
     container_name: rui-app
-
     env_file: .env
     environment:
       RUI_RELAY_URL: http://relay:3001/Home/ObtenerDatosRUI
     depends_on:
       - relay
     restart: unless-stopped
+    networks:
+      - rui-net
+      - dokploy-network
+
+networks:
+  evolution-net:
+    name: rui-net
+    driver: bridge
+  dokploy-network:
+    external: true
