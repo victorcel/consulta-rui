@@ -53,11 +53,20 @@ function buscarCampo(fields: CampoTexto[], patron: RegExp): string | null {
   return campo ? campo.value : null;
 }
 
+// El DNP devuelve varios campos que matchean el patrón amplio: "grupoIngresos"
+// (grupo de ingresos del hogar) y "grupRui" (solo la letra, ej. "B") aparecen
+// antes que "nivelRui" (el código completo, ej. "B06"), que es el que
+// queremos. Probamos primero el nombre exacto del campo para no confundirlos.
+export const CAMPO_NIVEL_RUI_EXACTO = /^nivel\s*rui$/i;
+export const CAMPO_NIVEL_RUI_AMPLIO = /grupo|nivel|clasificaci|sisb|rui/i;
+
 export function extraerCamposConsolidados(responseText: string): CamposConsolidados {
   const fields = extraerPares(responseText);
 
   return {
-    nivelRui: buscarCampo(fields, /grupo|nivel|clasificaci|sisb|rui/i),
+    nivelRui:
+      buscarCampo(fields, CAMPO_NIVEL_RUI_EXACTO) ??
+      buscarCampo(fields, CAMPO_NIVEL_RUI_AMPLIO),
     municipio: buscarCampo(fields, /municipio/i),
     departamento: buscarCampo(fields, /departamento/i),
     nombre: buscarCampo(fields, /nombre/i),

@@ -24,6 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { detectarNivelRui, type NivelRuiInfo } from '@/lib/rui-niveles';
+import { CAMPO_NIVEL_RUI_EXACTO, CAMPO_NIVEL_RUI_AMPLIO } from '@/lib/rui-fields';
 
 const DOCUMENT_TYPES = [
   { value: '3', label: 'Cédula de ciudadanía' },
@@ -244,9 +245,9 @@ export default function Home() {
         setParsedFields(visibleFields);
         setIsResultOpen(true);
 
-        const campoNivel = fields.find((field) =>
-          /grupo|nivel|clasificaci|sisb|rui/i.test(field.label)
-        );
+        const campoNivel =
+          fields.find((field) => CAMPO_NIVEL_RUI_EXACTO.test(normalizarEtiqueta(field.label))) ??
+          fields.find((field) => CAMPO_NIVEL_RUI_AMPLIO.test(normalizarEtiqueta(field.label)));
         const nivel =
           (campoNivel && detectarNivelRui(campoNivel.value)) ||
           fields.map((field) => detectarNivelRui(field.value)).find(Boolean) ||
