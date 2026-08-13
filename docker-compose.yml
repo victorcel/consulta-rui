@@ -15,6 +15,7 @@ services:
       args:
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
     container_name: rui-app
+
     env_file: .env
     environment:
       RUI_RELAY_URL: http://relay:3001/Home/ObtenerDatosRUI
@@ -26,8 +27,7 @@ services:
       - dokploy-network
 
 networks:
-  evolution-net:
-    name: rui-net
+  rui-net:
     driver: bridge
   dokploy-network:
     external: true
