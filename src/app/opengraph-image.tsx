@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Consulta RUI - Registro Único de Ingreso";
+export const alt = "Consultar RUI por cédula - Registro Universal de Ingresos";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -68,7 +68,7 @@ export default async function OpengraphImage() {
             color: "#94a3b8",
           }}
         >
-          Registro Único de Ingreso · Colombia
+          Registro Universal de Ingresos · Colombia
         </div>
         <div
           style={{

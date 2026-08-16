@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,10 +14,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://consultarui.col0.com";
-const title = "Consulta RUI - Registro Único de Ingreso";
+const siteUrl = SITE_URL;
+const title =
+  "Consultar RUI por cédula 2026 - Registro Universal de Ingresos";
 const description =
-  "Consulta gratis y en línea tu información en el Registro Único de Ingreso (RUI) de Colombia. Servicio oficial, rápido y seguro.";
+  "Consulta el RUI por cédula gratis y en línea: conoce tu grupo y clasificación en el Registro Universal de Ingresos (el nuevo Sisbén) del DNP en Colombia.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -26,13 +28,22 @@ export const metadata: Metadata = {
   },
   description,
   keywords: [
-    "Consulta RUI",
-    "Registro Único de Ingreso",
+    "consultar RUI",
+    "RUI consulta",
+    "consulta RUI",
+    "RUI consultar",
+    "consultar RUI por cédula",
+    "RUI por cédula",
+    "Registro Universal de Ingresos",
     "RUI Colombia",
-    "consulta documento RUI",
+    "puntaje RUI",
+    "clasificación RUI",
+    "grupo RUI",
+    "certificado RUI",
+    "RUI nuevo Sisbén",
+    "RUI 2026",
     "DNP",
     "ventanilla social",
-    "cédula de ciudadanía",
     "registro social de hogares",
   ],
   authors: [{ name: "col0", url: "https://col0.com" }],
@@ -94,10 +105,19 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+// Schema de alcance global (aplica a todo el sitio). El FAQ y los pasos de
+// consulta viven en `lib/home-schema.ts` porque su contenido sólo es visible
+// en la portada.
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
+  "@id": `${siteUrl}#app`,
   name: "Consulta RUI",
+  alternateName: [
+    "Consultar RUI",
+    "RUI Consulta",
+    "Consultar RUI por cédula",
+  ],
   url: siteUrl,
   description,
   applicationCategory: "GovernmentApplication",

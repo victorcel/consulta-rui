@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Consulta RUI - Registro Único de Ingreso",
+    name: "Consultar RUI - Registro Universal de Ingresos",
     short_name: "Consulta RUI",
     description:
-      "Consulta gratis y en línea tu información en el Registro Único de Ingreso (RUI) de Colombia.",
+      "Consulta el RUI por cédula gratis y en línea: conoce tu grupo y clasificación en el Registro Universal de Ingresos (el nuevo Sisbén) del DNP en Colombia.",
     start_url: "/",
     display: "standalone",
     background_color: "#060912",

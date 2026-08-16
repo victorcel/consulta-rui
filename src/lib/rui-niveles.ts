@@ -20,7 +20,7 @@ export interface NivelRuiInfo {
   colorClass: string;
 }
 
-const INFO_POR_GRUPO: Record<GrupoRui, Omit<NivelRuiInfo, 'grupo' | 'codigo'>> = {
+export const INFO_POR_GRUPO: Record<GrupoRui, Omit<NivelRuiInfo, 'grupo' | 'codigo'>> = {
   A: {
     titulo: 'Pobreza extrema',
     descripcion:

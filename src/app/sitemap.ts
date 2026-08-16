@@ -1,14 +1,21 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://consultarui.col0.com";
+import { PAGINAS, SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+
   return [
     {
-      url: siteUrl,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
+      url: SITE_URL,
+      lastModified,
+      changeFrequency: "weekly",
       priority: 1,
     },
+    ...PAGINAS.map((pagina) => ({
+      url: `${SITE_URL}/${pagina.slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
   ];
 }
