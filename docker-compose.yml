@@ -66,7 +66,7 @@ services:
       - umami-net
 
   # Analytics self-hosted. Sin puerto publicado: se expone vía Dokploy con
-  # dominio propio (analytics.consultarui.col0.com) a través de dokploy-network.
+  # dominio propio (analytics.col0.com) a través de dokploy-network.
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
     container_name: rui-umami
