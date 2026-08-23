@@ -22,6 +22,7 @@ services:
       context: .
       args:
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+        NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${NEXT_PUBLIC_UMAMI_WEBSITE_ID}
     container_name: rui-app
     env_file: .env
     environment:
@@ -46,8 +47,47 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  umami-db:
+    image: postgres:16-alpine
+    container_name: rui-umami-db
+    environment:
+      POSTGRES_DB: ${UMAMI_POSTGRES_DB:-umami}
+      POSTGRES_USER: ${UMAMI_POSTGRES_USER:-umami}
+      POSTGRES_PASSWORD: ${UMAMI_POSTGRES_PASSWORD:-umami_password}
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${UMAMI_POSTGRES_USER:-umami}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - umami-net
+
+  # Analytics self-hosted. Sin puerto publicado: se expone vía Dokploy con
+  # dominio propio (consultarui.col0.com) a través de dokploy-network.
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: rui-umami
+    environment:
+      DATABASE_URL: postgresql://${UMAMI_POSTGRES_USER:-umami}:${UMAMI_POSTGRES_PASSWORD:-umami_password}@umami-db:5432/${UMAMI_POSTGRES_DB:-umami}
+      APP_SECRET: ${UMAMI_APP_SECRET:-cambia_este_secreto}
+    depends_on:
+      umami-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - umami-net
+      - dokploy-network
+
 networks:
   rui-net:
     driver: bridge
+  umami-net:
+    driver: bridge
   dokploy-network:
     external: true
+
+volumes:
+  umami-db-data:

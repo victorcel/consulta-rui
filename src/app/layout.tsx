@@ -136,6 +136,8 @@ const jsonLd = {
   },
 };
 
+const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -148,6 +150,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {umamiWebsiteId && (
+          <script
+            defer
+            src="https://consultarui.col0.com/script.js"
+            data-website-id={umamiWebsiteId}
+          />
+        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
