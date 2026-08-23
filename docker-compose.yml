@@ -8,6 +8,14 @@ services:
     restart: unless-stopped
     networks:
       - rui-net
+    healthcheck:
+      test: ["CMD", "bun", "healthcheck.js"]
+      interval: 30s
+      timeout: 25s
+      retries: 3
+      start_period: 15s
+    labels:
+      - "autoheal=true"
 
   app:
     build:
@@ -15,16 +23,28 @@ services:
       args:
         NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
     container_name: rui-app
-
     env_file: .env
     environment:
       RUI_RELAY_URL: http://relay:3001/Home/ObtenerDatosRUI
+      HOSTNAME: "0.0.0.0"
     depends_on:
       - relay
     restart: unless-stopped
     networks:
       - rui-net
       - dokploy-network
+
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: rui-autoheal
+    restart: unless-stopped
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+      AUTOHEAL_INTERVAL: 30
+      AUTOHEAL_START_PERIOD: 30
+      AUTOHEAL_DEFAULT_STOP_TIMEOUT: 10
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   rui-net:
