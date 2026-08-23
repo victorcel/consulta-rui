@@ -153,7 +153,7 @@ export default function RootLayout({
         {umamiWebsiteId && (
           <script
             defer
-            src="https://consultarui.col0.com/script.js"
+            src="https://analytics.consultarui.col0.com/script.js"
             data-website-id={umamiWebsiteId}
           />
         )}
