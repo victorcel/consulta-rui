@@ -4,7 +4,7 @@ import { extraerCamposConsolidados } from '@/lib/rui-fields';
 
 const DNP_URL = 'https://ventanillasocial.dnp.gov.co/Home/ObtenerDatosRUI';
 const DIRECT_TIMEOUT_MS = 10000;
-const RELAY_TIMEOUT_MS = 18000;
+const RELAY_TIMEOUT_MS = 25000;
 
 async function verifyTurnstileToken(
   token: string,

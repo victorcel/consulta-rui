@@ -191,12 +191,10 @@ async function consultarDNP(body, contentType) {
         headers: { 'Content-Type': contentType },
         body,
         signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
-      })
-        .then(async (r) => {
-          const t = await r.text();
-          return { ok: true, status: r.status, contentType: r.headers.get('content-type'), body: t };
-        })
-        .catch(() => null);
+      }).then(async (r) => {
+        const t = await r.text();
+        return { ok: true, status: r.status, contentType: r.headers.get('content-type'), body: t };
+      });
 
   if (Date.now() - proxyPoolFetchedAt > 5 * 60 * 1000 || proxyPool.length === 0) {
     await refreshProxyPool();
@@ -207,8 +205,7 @@ async function consultarDNP(body, contentType) {
     const [host, port] = px.split(':');
     return requestViaProxy(host, port, body, contentType)
       .then(completarRespuesta)
-      .then((r) => ({ ok: true, ...r }))
-      .catch(() => null);
+      .then((r) => ({ ok: true, ...r }));
   });
 
   const resultados = await Promise.any([directo, ...viaProxy]).catch(
