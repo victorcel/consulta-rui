@@ -111,13 +111,39 @@ export default function Home() {
   const [hasError, setHasError] = useState(false);
   const [isResultOpen, setIsResultOpen] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileScriptLoaded, setTurnstileScriptLoaded] = useState(false);
+  // Con `strategy="afterInteractive"`, next/script sólo inyecta el <script>
+  // de Turnstile una vez por sesión de navegación: si el usuario ya visitó
+  // la portada, navega a otra página y vuelve (client-side routing), este
+  // componente se vuelve a montar pero el script global no se reinyecta ni
+  // vuelve a disparar `onLoad`. Por eso no basta con escuchar `onLoad`: hay
+  // que comprobar también si `window.turnstile` ya está disponible al
+  // montar, y si no, sondear brevemente por si la carga sigue en curso.
+  const [turnstileReady, setTurnstileReady] = useState(
+    () => typeof window !== 'undefined' && !!window.turnstile
+  );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!turnstileScriptLoaded || !turnstileContainerRef.current) return;
+    if (turnstileReady || typeof window === 'undefined') return;
+    if (window.turnstile) {
+      setTurnstileReady(true);
+      return;
+    }
+    // El script pudo quedar cargándose desde una navegación previa: sondea
+    // hasta que `window.turnstile` aparezca.
+    const interval = setInterval(() => {
+      if (window.turnstile) {
+        setTurnstileReady(true);
+        clearInterval(interval);
+      }
+    }, 150);
+    return () => clearInterval(interval);
+  }, [turnstileReady]);
+
+  useEffect(() => {
+    if (!turnstileReady || !turnstileContainerRef.current) return;
     if (turnstileWidgetIdRef.current || !window.turnstile) return;
 
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -158,7 +184,7 @@ export default function Home() {
         turnstileWidgetIdRef.current = null;
       }
     };
-  }, [turnstileScriptLoaded, toast]);
+  }, [turnstileReady, toast]);
 
   const parseHtmlResponse = useCallback((html: string): RUIField[] => {
     const fields: RUIField[] = [];
@@ -326,7 +352,7 @@ export default function Home() {
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js"
         strategy="afterInteractive"
-        onLoad={() => setTurnstileScriptLoaded(true)}
+        onLoad={() => setTurnstileReady(true)}
       />
 
       {/* Background gradient effects */}
