@@ -7,8 +7,9 @@ import {
   Breadcrumb,
   CtaConsulta,
   EnlacesRelacionados,
+  FechaActualizacion,
 } from '@/components/site-blocks';
-import { paginasRelacionadas } from '@/lib/site';
+import { fechaActualizacion, paginasRelacionadas } from '@/lib/site';
 import { INFO_POR_GRUPO, type GrupoRui } from '@/lib/rui-niveles';
 
 const slug = 'clasificacion-rui';
@@ -30,6 +31,7 @@ export default function ClasificacionRui() {
       <article className="w-full max-w-2xl mx-auto mt-6 sm:mt-10 space-y-12">
         <header>
           <Breadcrumb titulo="Grupos y clasificación" slug={slug} />
+          <FechaActualizacion fecha={fechaActualizacion(slug)} slug={slug} />
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#e2e8f0] mb-4 leading-tight">
             Clasificación del RUI: grupos A, B, C y D
           </h1>
@@ -104,6 +106,37 @@ export default function ClasificacionRui() {
 
         <section>
           <h2 className="text-xl sm:text-2xl font-bold text-[#e2e8f0] mb-3">
+            Por qué unos grupos tienen más subgrupos que otros
+          </h2>
+          <p className="text-sm text-[#94a3b8] leading-relaxed mb-4">
+            El grupo A (pobreza extrema) y el grupo B (pobreza moderada) tienen
+            pocos subgrupos —5 y 7 respectivamente— porque cubren un tramo
+            angosto de la escala de ingresos: la diferencia entre A1 y A5, o
+            entre B1 y B7, es relativamente pequeña. El grupo C (vulnerabilidad)
+            en cambio abarca 18 subgrupos, de C1 a C18, porque agrupa
+            situaciones muy distintas: desde hogares apenas por encima de la
+            línea de pobreza hasta hogares con una holgura económica
+            considerable. El grupo D (ni pobre ni vulnerable), con 21 subgrupos,
+            es el más amplio de todos.
+          </p>
+          <p className="text-sm text-[#94a3b8] leading-relaxed">
+            Por eso dos personas en el mismo grupo pueden tener acceso muy
+            distinto a un mismo programa si están en subgrupos alejados: alguien
+            en C1 suele conservar buena parte de los beneficios del grupo B,
+            mientras que alguien en C18 se acerca más a las condiciones del
+            grupo D. Revisa el detalle de{' '}
+            <Link
+              href="/subsidios-rui"
+              className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+            >
+              qué subsidios corresponden a cada grupo y subgrupo
+            </Link>
+            .
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#e2e8f0] mb-3">
             Cuándo la clasificación no coincide con tu realidad
           </h2>
           <p className="text-sm text-[#94a3b8] leading-relaxed">
@@ -112,7 +145,14 @@ export default function ClasificacionRui() {
             usadas por terceros, ingresos puntuales o información desactualizada
             de alguna entidad. Si tu clasificación no corresponde con tus
             condiciones, la ruta es solicitar la revisión ante el DNP a través de
-            la Ventanilla Social o de la oficina de tu municipio.
+            la Ventanilla Social o de la oficina de tu municipio. Consulta{' '}
+            <Link
+              href="/corregir-datos-rui"
+              className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+            >
+              el paso a paso para corregir tus datos en el RUI
+            </Link>
+            .
           </p>
         </section>
 

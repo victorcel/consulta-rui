@@ -13,6 +13,8 @@ export interface ContenidoGrupo {
   implicaciones: string;
   /** Duda frecuente y específica de este grupo. */
   duda: { pregunta: string; respuesta: string };
+  /** Qué diferencia hay entre el primer y el último subgrupo del grupo. */
+  extremos: { primero: string; ultimo: string };
 }
 
 export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
@@ -27,6 +29,12 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
       respuesta:
         'No. El grupo A da la máxima prioridad, pero cada programa mantiene requisitos propios además de la clasificación: edad, composición del hogar, municipio o disponibilidad de cupos. La clasificación abre la puerta; no adjudica el beneficio de forma automática.',
     },
+    extremos: {
+      primero:
+        'A1 es el subgrupo de mayor prioridad de todo el RUI: concentra a los hogares con la situación económica más precaria del país.',
+      ultimo:
+        'A5, aunque sigue siendo pobreza extrema, corresponde a hogares con una situación algo menos crítica que la de A1 dentro del mismo grupo.',
+    },
   },
   B: {
     subgrupos: 7,
@@ -38,6 +46,12 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
       pregunta: '¿Cuál es la diferencia real entre el grupo A y el B?',
       respuesta:
         'Ambos son grupos de pobreza y conservan acceso a los principales programas sociales. La diferencia está en el nivel estimado de ingresos y, por tanto, en el orden de prioridad: cuando un programa asigna cupos o gradúa el monto del subsidio, el grupo A se atiende primero.',
+    },
+    extremos: {
+      primero:
+        'B1 se ubica justo debajo del grupo A: hogares en pobreza con ingresos apenas superiores a los del subgrupo A5.',
+      ultimo:
+        'B7 es el último tramo de pobreza antes de entrar a la vulnerabilidad del grupo C, con condiciones algo más holgadas que el resto del grupo B.',
     },
   },
   C: {
@@ -51,6 +65,12 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
       respuesta:
         'Porque abarca el tramo más amplio de la escala de ingresos: desde hogares apenas por encima de la línea de pobreza hasta hogares con una situación considerablemente más holgada. Los dieciocho subgrupos permiten diferenciar situaciones muy distintas que, agrupadas, quedarían mal representadas.',
     },
+    extremos: {
+      primero:
+        'C1 conserva condiciones parecidas a las del grupo B: suele mantener acceso a Colombia Mayor y a copagos reducidos en salud.',
+      ultimo:
+        'C18 es el subgrupo más consultado del grupo C: se acerca a las condiciones del grupo D y su acceso a subsidios directos es limitado, aunque puede mantener prioridad en programas educativos y de vivienda según la entidad.',
+    },
   },
   D: {
     subgrupos: 21,
@@ -62,6 +82,12 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
       pregunta: '¿Quedar en grupo D significa perder la salud subsidiada?',
       respuesta:
         'No implica quedar sin cobertura en salud, pero sí cambia la forma de acceso: los hogares del grupo D pueden vincularse mediante aporte solidario con copago, en lugar de la afiliación sin costo que aplica a los grupos A y B. La entidad responsable define la transición.',
+    },
+    extremos: {
+      primero:
+        'D1 conserva algo de cercanía con la vulnerabilidad del grupo C, por lo que en algunos municipios puede acceder a beneficios educativos focalizados.',
+      ultimo:
+        'D21 es el subgrupo con menor prioridad de todo el RUI: corresponde a los hogares con mayor capacidad económica dentro de la escala del sistema.',
     },
   },
 };

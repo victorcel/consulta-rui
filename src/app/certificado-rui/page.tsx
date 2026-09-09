@@ -5,8 +5,9 @@ import {
   Breadcrumb,
   CtaConsulta,
   EnlacesRelacionados,
+  FechaActualizacion,
 } from '@/components/site-blocks';
-import { paginasRelacionadas } from '@/lib/site';
+import { fechaActualizacion, paginasRelacionadas } from '@/lib/site';
 
 const slug = 'certificado-rui';
 
@@ -31,6 +32,7 @@ export default function CertificadoRui() {
       <article className="w-full max-w-2xl mx-auto mt-6 sm:mt-10 space-y-12">
         <header>
           <Breadcrumb titulo="Certificado del RUI" slug={slug} />
+          <FechaActualizacion fecha={fechaActualizacion(slug)} slug={slug} />
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#e2e8f0] mb-4 leading-tight">
             Certificado del RUI: cómo descargarlo en PDF
           </h1>

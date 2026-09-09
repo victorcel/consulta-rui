@@ -1,6 +1,53 @@
 import Link from 'next/link';
-import { AlertCircle, ChevronRight, Search } from 'lucide-react';
+import { AlertCircle, CalendarClock, ChevronRight, Search } from 'lucide-react';
 import { SITE_URL } from '@/lib/site';
+
+const FORMATO_FECHA = new Intl.DateTimeFormat('es-CO', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'America/Bogota',
+});
+
+/**
+ * Fecha de última revisión editorial: visible para el usuario y, cuando se
+ * pasa `slug`, también declarada como `dateModified` en un schema WebPage
+ * (señal de frescura para Google, además de la fecha visible en pantalla).
+ */
+export function FechaActualizacion({
+  fecha,
+  slug,
+}: {
+  fecha: string;
+  slug?: string;
+}) {
+  const formateada = FORMATO_FECHA.format(new Date(`${fecha}T00:00:00-05:00`));
+  const jsonLd = slug
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        '@id': `${SITE_URL}/${slug}#webpage`,
+        url: `${SITE_URL}/${slug}`,
+        dateModified: fecha,
+        inLanguage: 'es-CO',
+      }
+    : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <p className="flex items-center gap-1.5 text-xs text-[#64748b] mb-4">
+        <CalendarClock className="w-3.5 h-3.5" />
+        Última actualización: <time dateTime={fecha}>{formateada}</time>
+      </p>
+    </>
+  );
+}
 
 /** Miga de pan visible + schema BreadcrumbList para que Google la muestre en el resultado. */
 export function Breadcrumb({ titulo, slug }: { titulo: string; slug: string }) {

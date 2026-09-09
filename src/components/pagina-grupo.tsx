@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { SiteShell } from '@/components/site-shell';
 import {
@@ -6,8 +7,9 @@ import {
   Breadcrumb,
   CtaConsulta,
   EnlacesRelacionados,
+  FechaActualizacion,
 } from '@/components/site-blocks';
-import { paginasRelacionadas, SITE_URL } from '@/lib/site';
+import { fechaActualizacion, paginasRelacionadas, SITE_URL } from '@/lib/site';
 import { INFO_POR_GRUPO, type GrupoRui } from '@/lib/rui-niveles';
 import { CONTENIDO_POR_GRUPO } from '@/lib/rui-grupos-contenido';
 
@@ -59,6 +61,7 @@ export function PaginaGrupo({ grupo }: { grupo: GrupoRui }) {
       <article className="w-full max-w-2xl mx-auto mt-6 sm:mt-10 space-y-12">
         <header>
           <Breadcrumb titulo={`Grupo ${grupo} del RUI`} slug={slug} />
+          <FechaActualizacion fecha={fechaActualizacion(slug)} slug={slug} />
           <div className="flex items-center gap-2 flex-wrap mb-4">
             <Badge
               variant="outline"
@@ -119,6 +122,41 @@ export function PaginaGrupo({ grupo }: { grupo: GrupoRui }) {
               tu elegibilidad en el DNP o en la entidad responsable del programa.
             </p>
           </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#e2e8f0] mb-4">
+            Diferencia entre el primer y el último subgrupo
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-[#1e293b] bg-[#0c1120]/60 p-4">
+              <h3 className="text-sm font-semibold text-[#e2e8f0] mb-1.5">
+                {grupo}1
+              </h3>
+              <p className="text-xs text-[#94a3b8] leading-relaxed">
+                {contenido.extremos.primero}
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#1e293b] bg-[#0c1120]/60 p-4">
+              <h3 className="text-sm font-semibold text-[#e2e8f0] mb-1.5">
+                {grupo}
+                {contenido.subgrupos}
+              </h3>
+              <p className="text-xs text-[#94a3b8] leading-relaxed">
+                {contenido.extremos.ultimo}
+              </p>
+            </div>
+          </div>
+          <p className="text-xs text-[#64748b] leading-relaxed mt-3">
+            Revisa el detalle de subsidios por subgrupo en{' '}
+            <Link
+              href="/subsidios-rui"
+              className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+            >
+              subsidios según tu grupo del RUI
+            </Link>
+            .
+          </p>
         </section>
 
         <section>
