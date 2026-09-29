@@ -25,6 +25,9 @@ const DNP_PORT = 443;
 const DNP_PATH = '/Home/ObtenerDatosRUI';
 const PORT = process.env.PORT || 3001;
 const ATTEMPT_TIMEOUT_MS = 20000;
+const DNP_ORIGIN = `https://${DNP_HOST}`;
+const USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36';
 const PROXY_POOL_URL =
   'https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&protocol=http&proxy_format=ipport&format=text&country=co&timeout=20000';
 
@@ -59,7 +62,7 @@ async function refreshProxyPool() {
 }
 
 // Petición HTTPS al DNP a través de un proxy HTTP (CONNECT + TLS).
-function requestViaProxy(proxyHost, proxyPort, body, contentType) {
+function requestViaProxy(proxyHost, proxyPort, method, path, headers, body) {
   return new Promise((resolve, reject) => {
     const socket = netConnect({ host: proxyHost, port: Number(proxyPort) });
     let settled = false;
@@ -142,14 +145,16 @@ function requestViaProxy(proxyHost, proxyPort, body, contentType) {
       });
 
       tlsSocket.on('secureConnect', () => {
-        tlsSocket.write(
-          `POST ${DNP_PATH} HTTP/1.1\r\n` +
-            `Host: ${DNP_HOST}\r\n` +
-            `Content-Type: ${contentType}\r\n` +
-            `Content-Length: ${body.length}\r\n` +
-            'Connection: close\r\n\r\n' +
-            body
-        );
+        const cabeceras = Object.entries({
+          Host: DNP_HOST,
+          'Content-Length': body.length,
+          Connection: 'close',
+          ...headers,
+        })
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('\r\n');
+        tlsSocket.write(`${method} ${path} HTTP/1.1\r\n${cabeceras}\r\n\r\n`);
+        if (body.length) tlsSocket.write(body);
       });
     });
   });
@@ -176,6 +181,7 @@ function completarRespuesta(firstChunk) {
       resolve({
         status,
         contentType,
+        head: headerBlock,
         body: raw.slice(split + 4),
       });
     } else {
@@ -184,19 +190,45 @@ function completarRespuesta(firstChunk) {
   });
 }
 
+// El DNP exige el mismo flujo que el navegador: GET / entrega el nonce
+// (_ruiPubNonce) y las cookies de sesión; el POST los reenvía (X-Rui-Nonce, Cookie).
+const extraerNonce = (html) => /_ruiPubNonce\s*=\s*'([^']+)'/.exec(html)?.[1];
+
+function cabecerasConsulta(nonce, cookie, contentType) {
+  return {
+    Accept: '*/*',
+    'Content-Type': contentType,
+    Cookie: cookie,
+    Origin: DNP_ORIGIN,
+    Referer: DNP_ORIGIN + '/',
+    'User-Agent': USER_AGENT,
+    'X-Rui-Nonce': nonce,
+  };
+}
+
+async function consultarViaProxy(host, port, body, contentType) {
+  const home = await requestViaProxy(host, port, 'GET', '/', { Accept: 'text/html', 'User-Agent': USER_AGENT }, '').then(completarRespuesta);
+  const nonce = extraerNonce(home.body);
+  if (home.status !== 200 || !nonce) throw new Error('sin nonce en la portada del DNP');
+  const cookie = [...home.head.matchAll(/^set-cookie:\s*([^;\r\n]+)/gim)].map((m) => m[1]).join('; ');
+  return requestViaProxy(host, port, 'POST', DNP_PATH, cabecerasConsulta(nonce, cookie, contentType), body).then(completarRespuesta);
+}
+
+async function consultarDirecto(body, contentType) {
+  const signal = AbortSignal.timeout(ATTEMPT_TIMEOUT_MS);
+  const home = await fetch(DNP_ORIGIN + '/', { headers: { 'User-Agent': USER_AGENT }, signal });
+  const nonce = extraerNonce(await home.text());
+  if (!nonce) throw new Error('sin nonce en la portada del DNP');
+  const cookie = home.headers.getSetCookie().map((c) => c.split(';')[0]).join('; ');
+  const r = await fetch(DNP_ORIGIN + DNP_PATH, { method: 'POST', headers: cabecerasConsulta(nonce, cookie, contentType), body, signal });
+  return { status: r.status, contentType: r.headers.get('content-type'), body: await r.text() };
+}
+
 async function consultarDNP(body, contentType) {
   const skipDirect = process.env.RELAY_SKIP_DIRECT === '1';
   const directo = skipDirect
     ? Promise.reject(new Error('directo desactivado'))
-    : fetch(`https://${DNP_HOST}${DNP_PATH}`, {
-        method: 'POST',
-        headers: { 'Content-Type': contentType },
-        body,
-        signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
-      }).then(async (r) => {
-        const t = await r.text();
-        return { ok: true, status: r.status, contentType: r.headers.get('content-type'), body: t };
-      });
+    : consultarDirecto(body, contentType).then((r) => ({ ok: true, ...r }));
 
   if (Date.now() - proxyPoolFetchedAt > 5 * 60 * 1000 || proxyPool.length === 0) {
     await refreshProxyPool();
@@ -206,8 +238,7 @@ async function consultarDNP(body, contentType) {
 
   const viaProxy = pool.map((px) => {
     const [host, port] = px.split(':');
-    return requestViaProxy(host, port, body, contentType)
-      .then(completarRespuesta)
+    return consultarViaProxy(host, port, body, contentType)
       .then((r) => {
         // Un proxy que devuelve error/basura no debe ganar la carrera.
         if (r.status !== 200 || !r.body) throw new Error('respuesta inválida: ' + r.status);
