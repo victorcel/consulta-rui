@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AlertCircle, CalendarClock, ChevronRight, Search } from 'lucide-react';
+import { AlertCircle, CalendarClock, ChevronRight, ExternalLink, Search } from 'lucide-react';
 import { SITE_URL } from '@/lib/site';
 
 const FORMATO_FECHA = new Intl.DateTimeFormat('es-CO', {
@@ -90,23 +90,43 @@ export function Breadcrumb({ titulo, slug }: { titulo: string; slug: string }) {
   );
 }
 
-/** Llamada a la acción que devuelve al formulario de la portada. */
-export function CtaConsulta() {
+export const URL_VENTANILLA = 'https://ventanillasocial.dnp.gov.co/';
+
+/** Botón secundario que lleva al portal oficial de la Ventanilla Social del DNP. */
+export function BotonVentanilla({ texto = 'Ir a la Ventanilla Social' }: { texto?: string }) {
+  return (
+    <a
+      href={URL_VENTANILLA}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-md text-sm font-semibold text-[#22d3ee] border border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-colors mt-4"
+    >
+      {texto}
+      <ExternalLink className="w-4 h-4" />
+    </a>
+  );
+}
+
+/** Llamada a la acción que lleva al formulario de la portada (ancla #consulta). */
+export function CtaConsulta({
+  titulo = 'Consulta tu clasificación en el RUI',
+  texto = 'Ingresa tu número de documento y conoce tu grupo en pocos pasos. La consulta es gratuita.',
+  boton = 'Consultar RUI',
+}: {
+  titulo?: string;
+  texto?: string;
+  boton?: string;
+}) {
   return (
     <section className="rounded-lg border border-[#06b6d4]/20 bg-[#06b6d4]/5 p-5 text-center">
-      <h2 className="text-base font-semibold text-[#e2e8f0] mb-1.5">
-        Consulta tu clasificación en el RUI
-      </h2>
-      <p className="text-sm text-[#94a3b8] leading-relaxed mb-4">
-        Ingresa tu número de documento y conoce tu grupo en menos de tres minutos.
-        La consulta es gratuita.
-      </p>
+      <h2 className="text-base font-semibold text-[#e2e8f0] mb-1.5">{titulo}</h2>
+      <p className="text-sm text-[#94a3b8] leading-relaxed mb-4">{texto}</p>
       <Link
-        href="/"
+        href="/#consulta"
         className="inline-flex items-center justify-center h-11 px-6 rounded-md text-sm font-semibold text-white bg-gradient-to-r from-[#06b6d4] to-[#0891b2] hover:from-[#22d3ee] hover:to-[#06b6d4] shadow-lg shadow-[#06b6d4]/20 hover:shadow-[#06b6d4]/30 transition-all duration-300"
       >
         <Search className="w-4 h-4 mr-2" />
-        Consultar RUI
+        {boton}
       </Link>
     </section>
   );

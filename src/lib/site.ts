@@ -96,9 +96,28 @@ export function fechaActualizacion(slug: string): string {
   return PAGINAS.find((p) => p.slug === slug)?.actualizado ?? '2026-09-09';
 }
 
+/** Siguiente mejor paso por página; lo que no esté aquí usa el orden de PAGINAS. */
+const SIGUIENTES: Record<string, string[]> = {
+  'que-es-el-rui': ['clasificacion-rui', 'rui-vs-sisben', 'subsidios-rui', 'certificado-rui'],
+  'clasificacion-rui': ['subsidios-rui', 'corregir-datos-rui', 'certificado-rui', 'rui-vs-sisben'],
+  'certificado-rui': ['clasificacion-rui', 'subsidios-rui', 'corregir-datos-rui', 'que-es-el-rui'],
+  'rui-vs-sisben': ['que-paso-con-mi-puntaje-sisben', 'clasificacion-rui', 'subsidios-rui', 'corregir-datos-rui'],
+  'subsidios-rui': ['clasificacion-rui', 'certificado-rui', 'corregir-datos-rui', 'rui-vs-sisben'],
+  'que-paso-con-mi-puntaje-sisben': ['clasificacion-rui', 'subsidios-rui', 'corregir-datos-rui', 'certificado-rui'],
+  'corregir-datos-rui': ['clasificacion-rui', 'certificado-rui', 'subsidios-rui', 'que-paso-con-mi-puntaje-sisben'],
+  'grupo-a-rui': ['subsidios-rui', 'clasificacion-rui', 'certificado-rui', 'corregir-datos-rui'],
+  'grupo-b-rui': ['subsidios-rui', 'clasificacion-rui', 'certificado-rui', 'corregir-datos-rui'],
+  'grupo-c-rui': ['subsidios-rui', 'clasificacion-rui', 'corregir-datos-rui', 'certificado-rui'],
+  'grupo-d-rui': ['subsidios-rui', 'clasificacion-rui', 'corregir-datos-rui', 'certificado-rui'],
+};
+
 /** Devuelve hasta `limite` páginas distintas de la actual, para enlaces internos. */
 export function paginasRelacionadas(slugActual: string, limite = 4) {
-  return PAGINAS.filter((p) => p.slug !== slugActual)
+  const orden = SIGUIENTES[slugActual];
+  const candidatas = orden
+    ? orden.map((s) => PAGINAS.find((p) => p.slug === s)!)
+    : PAGINAS.filter((p) => p.slug !== slugActual);
+  return candidatas
     .slice(0, limite)
     .map((p) => ({
       href: `/${p.slug}`,

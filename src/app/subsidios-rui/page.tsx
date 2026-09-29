@@ -22,36 +22,45 @@ export const metadata: Metadata = {
   alternates: { canonical: `/${slug}` },
 };
 
-const PROGRAMAS = [
+const PROGRAMAS: {
+  nombre: string;
+  detalle: string;
+  fuente?: { href: string; texto: string };
+}[] = [
   {
     nombre: 'Régimen subsidiado de salud',
     detalle:
       'Los grupos A y B suelen acceder sin costo. En el grupo C el acceso normalmente implica copagos que aumentan a medida que sube el subgrupo. El grupo D se vincula mediante aporte solidario con copago.',
   },
   {
-    nombre: 'Familias en Acción y Jóvenes en Acción',
+    nombre: 'Renta Ciudadana',
     detalle:
-      'Prioridad para los grupos A y B. En el grupo C el acceso depende del subgrupo y de la disponibilidad de cupos en el municipio; en el grupo D es excepcional.',
+      'Prosperidad Social la dirige a hogares en pobreza extrema, pobreza y vulnerabilidad, con prioridad para los que tienen personas con discapacidad, niños pequeños o adolescentes. La asigna la entidad: puedes consultar si tu hogar es beneficiario en su portal.',
+    fuente: { href: 'https://prosperidadsocial.gov.co/sgpp/transferencias/renta-ciudadana/', texto: 'Renta Ciudadana en Prosperidad Social' },
   },
   {
     nombre: 'Colombia Mayor',
     detalle:
-      'Enfocado en los grupos A y B, y en los primeros subgrupos del grupo C (aproximadamente hasta C10, aunque el corte exacto lo define la entidad cada periodo).',
+      'Según Prosperidad Social atiende los grupos A y B y el grupo C solo hasta el subgrupo C1 (clasificación Sisbén IV). Además exige tener al menos 54 años las mujeres y 59 los hombres, y no recibir pensión. La inscripción se hace en la alcaldía con la cédula, y los cupos se asignan por orden de prioridad.',
+    fuente: { href: 'https://prosperidadsocial.gov.co/colombia-mayor/', texto: 'Colombia Mayor en Prosperidad Social' },
   },
   {
-    nombre: 'Subsidio de vivienda (Mi Casa Ya y similares)',
+    nombre: 'Subsidio de vivienda (Mi Casa Ya)',
     detalle:
-      'El porcentaje de subsidio es mayor en el grupo A y desciende de forma gradual en B y C. El grupo D puede acceder a líneas de crédito blando, pero no al subsidio directo.',
+      'Según Minvivienda, el subsidio a la cuota inicial cubre de A1 a D20: 30 SMMLV de A1 a C8 y 20 SMMLV de C9 a D20. Exige además un crédito hipotecario o leasing aprobado y no tener vivienda propia. Los cupos son limitados.',
+    fuente: { href: 'https://www.minvivienda.gov.co/viceministerio-de-vivienda/mi-casa-ya/subsidio-familiar-de-vivienda-nueva-0', texto: 'Mi Casa Ya en Minvivienda' },
   },
   {
-    nombre: 'Renta Joven y beneficios educativos (ICETEX, matrícula cero)',
+    nombre: 'Renta Joven y apoyos educativos (ICETEX, matrícula cero)',
     detalle:
-      'Los grupos A, B y los primeros subgrupos de C suelen tener prioridad. Algunos programas educativos, como ciertas líneas de Generación E, no dependen exclusivamente del grupo del RUI sino también del puntaje académico.',
+      'Renta Joven exige estar en el Sisbén vigente, o en el instrumento de focalización que lo reemplace, con clasificación en pobreza extrema, pobreza o vulnerabilidad; los cortes exactos están en su manual operativo. Otros apoyos, como ciertas líneas de Generación E, no dependen solo del grupo sino también del puntaje académico.',
+    fuente: { href: 'https://prosperidadsocial.gov.co/sgpp/transferencias/renta-joven/', texto: 'Renta Joven en Prosperidad Social' },
   },
   {
     nombre: 'Devolución del IVA',
     detalle:
-      'Dirigida principalmente a los grupos A y B, con criterios adicionales de composición del hogar que define el DNP.',
+      'Es un programa de Prosperidad Social con criterios propios de focalización: no depende solo del grupo del RUI. Confirma en su portal si tu hogar es beneficiario.',
+    fuente: { href: 'https://prosperidadsocial.gov.co/', texto: 'Portal de Prosperidad Social' },
   },
 ];
 
@@ -74,6 +83,12 @@ export default function SubsidiosRui() {
           </p>
         </header>
 
+        <CtaConsulta
+          titulo="Primero, conoce tu grupo"
+          texto="Los subsidios dependen de tu grupo y subgrupo. Consúltalos en un momento y luego revisa qué programas te corresponden."
+          boton="Consultar mi grupo"
+        />
+
         <section>
           <div className="rounded-lg border border-[#1e293b] bg-[#111827]/60 p-4">
             <p className="text-xs text-[#94a3b8] leading-relaxed">
@@ -81,7 +96,9 @@ export default function SubsidiosRui() {
               un grupo determinado no garantiza recibir un beneficio concreto.
               Cada entidad revisa además edad, composición del hogar, municipio
               y disponibilidad presupuestal. Los cortes por subgrupo pueden
-              cambiar de un periodo a otro; confirma siempre en la entidad
+              cambiar de un periodo a otro. Los cortes oficiales publicados hoy
+              siguen referidos al Sisbén IV y las entidades pueden ajustarlos
+              durante la transición al RUI; confirma siempre en la entidad
               responsable del programa.
             </p>
           </div>
@@ -103,6 +120,16 @@ export default function SubsidiosRui() {
                 <p className="text-xs text-[#94a3b8] leading-relaxed">
                   {programa.detalle}
                 </p>
+                {programa.fuente && (
+                  <a
+                    href={programa.fuente.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-2 text-xs font-medium text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+                  >
+                    {programa.fuente.texto} →
+                  </a>
+                )}
               </div>
             ))}
           </div>
@@ -175,7 +202,6 @@ export default function SubsidiosRui() {
           </p>
         </section>
 
-        <CtaConsulta />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>

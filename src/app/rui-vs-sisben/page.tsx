@@ -22,7 +22,7 @@ const COMPARACION = [
   {
     criterio: 'Cómo se recoge la información',
     sisben: 'Encuesta presencial en el hogar, solicitada por el ciudadano.',
-    rui: 'Cruce automático de bases de datos oficiales, sin encuesta.',
+    rui: 'Parte de la base del Sisbén y la fortalece con registros administrativos oficiales, sin exigir una encuesta nueva.',
   },
   {
     criterio: 'Resultado que entrega',
@@ -31,7 +31,7 @@ const COMPARACION = [
   },
   {
     criterio: 'Actualización',
-    sisben: 'Requiere solicitar una nueva encuesta para actualizar los datos.',
+    sisben: 'Para actualizar los datos hay que solicitar una nueva encuesta.',
     rui: 'Se recalcula de forma periódica con la información reportada.',
   },
   {
@@ -54,8 +54,9 @@ export default function RuiVsSisben() {
           <p className="text-[#94a3b8] text-sm sm:text-base leading-relaxed">
             Desde el 1 de agosto de 2026, el Registro Universal de Ingresos
             reemplaza al Sisbén como instrumento principal para focalizar el
-            gasto social en Colombia. El cambio no es solo de nombre: cambia la
-            forma de calcular la clasificación.
+            gasto social en Colombia. El Sisbén no desaparece —según el DNP
+            evoluciona y sigue siendo la base—, pero cambia la forma de calcular
+            la clasificación.
           </p>
         </header>
 
@@ -137,7 +138,11 @@ export default function RuiVsSisben() {
           </p>
         </section>
 
-        <CtaConsulta />
+        <CtaConsulta
+          titulo="Tu clasificación pudo cambiar con el RUI"
+          texto="Antes del 31 de octubre de 2026, confirma en qué grupo quedó tu hogar con el nuevo sistema."
+          boton="Consultar mi grupo en el RUI"
+        />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>

@@ -1,8 +1,8 @@
 # Consulta RUI
 
-> Servicio web gratuito para consultar información en el Registro Único de Ingreso (RUI) del Departamento Nacional de Planeación (DNP) de Colombia.
+> Servicio web gratuito para consultar información en el Registro Universal de Ingresos (RUI) del Departamento Nacional de Planeación (DNP) de Colombia.
 
-Consulta RUI permite a cualquier ciudadano colombiano verificar su estado en el Registro Único de Ingreso ingresando su tipo y número de documento de identidad. El resultado se muestra al instante en pantalla.
+Consulta RUI permite a cualquier ciudadano colombiano verificar su estado en el Registro Universal de Ingresos ingresando su tipo y número de documento de identidad. El resultado se muestra al instante en pantalla.
 
 ## Sobre el servicio
 

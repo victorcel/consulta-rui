@@ -28,9 +28,9 @@ export const INFO_POR_GRUPO: Record<GrupoRui, Omit<NivelRuiInfo, 'grupo' | 'codi
     beneficios: [
       'Régimen subsidiado de salud (afiliación sin costo)',
       'Colombia Mayor para adultos mayores que cumplan los demás requisitos',
-      'Prioridad en Familias en Acción y Jóvenes en Acción',
+      'Renta Ciudadana, con prioridad para hogares con niños pequeños o personas con discapacidad',
       'Renta Joven y apoyos educativos como matrícula cero',
-      'Mayor porcentaje de subsidio en programas de vivienda (Mi Casa Ya y similares)',
+      'Subsidio a la cuota inicial de vivienda con Mi Casa Ya (30 SMMLV de A1 a C8), sujeto a cupos',
       'Devolución del IVA y otros programas de transferencias monetarias',
     ],
     colorClass: 'from-red-500/20 to-red-500/5 border-red-500/30 text-red-300',
@@ -42,9 +42,9 @@ export const INFO_POR_GRUPO: Record<GrupoRui, Omit<NivelRuiInfo, 'grupo' | 'codi
     beneficios: [
       'Régimen subsidiado de salud (afiliación sin costo)',
       'Colombia Mayor para adultos mayores que cumplan los demás requisitos',
-      'Familias en Acción y Jóvenes en Acción',
+      'Renta Ciudadana, según la focalización de Prosperidad Social',
       'Renta Joven y apoyos educativos como matrícula cero',
-      'Subsidio de vivienda, en un porcentaje algo menor que el grupo A',
+      'Subsidio a la cuota inicial de vivienda con Mi Casa Ya (30 SMMLV de A1 a C8), sujeto a cupos',
     ],
     colorClass: 'from-orange-500/20 to-orange-500/5 border-orange-500/30 text-orange-300',
   },
@@ -54,9 +54,9 @@ export const INFO_POR_GRUPO: Record<GrupoRui, Omit<NivelRuiInfo, 'grupo' | 'codi
       'Hogares que no están en pobreza pero podrían caer en ella ante un choque económico. El acceso a algunos programas depende del subgrupo específico (los primeros subgrupos, más cercanos a C1, suelen tener más beneficios que los últimos, cercanos a C18).',
     beneficios: [
       'Régimen subsidiado de salud, generalmente con copagos según el subgrupo',
-      'Colombia Mayor, normalmente limitado a los primeros subgrupos de este grupo',
+      'Colombia Mayor, solo hasta el subgrupo C1',
       'Renta Joven y algunos apoyos educativos, según la institución',
-      'Subsidio de vivienda en un porcentaje reducido frente a los grupos A y B',
+      'Subsidio a la cuota inicial de vivienda con Mi Casa Ya: 30 SMMLV hasta C8 y 20 SMMLV de C9 en adelante, sujeto a cupos',
     ],
     colorClass: 'from-amber-500/20 to-amber-500/5 border-amber-500/30 text-amber-300',
   },
@@ -67,6 +67,7 @@ export const INFO_POR_GRUPO: Record<GrupoRui, Omit<NivelRuiInfo, 'grupo' | 'codi
     beneficios: [
       'Acceso al régimen subsidiado de salud mediante aporte solidario (con copago)',
       'Elegibilidad muy limitada o nula para la mayoría de programas de transferencias monetarias',
+      'Subsidio a la cuota inicial de vivienda con Mi Casa Ya (20 SMMLV) hasta el subgrupo D20, sujeto a cupos',
       'Puede aplicar a beneficios educativos que no dependan del nivel de pobreza (según la institución)',
     ],
     colorClass: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30 text-emerald-300',

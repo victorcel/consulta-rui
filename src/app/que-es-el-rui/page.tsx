@@ -32,7 +32,9 @@ export default function QueEsElRui() {
             El RUI es el instrumento con el que el Estado colombiano estima los
             ingresos de cada hogar y decide quién accede a los programas
             sociales. Entró en operación el 1 de agosto de 2026 y reemplaza al
-            Sisbén como mecanismo principal de focalización del gasto social.
+            Sisbén como instrumento principal de focalización del gasto social. El
+            Sisbén no desaparece: evoluciona y sigue aportando la base de
+            información de los hogares.
           </p>
         </header>
 
@@ -57,8 +59,9 @@ export default function QueEsElRui() {
             Cómo calcula los ingresos de un hogar
           </h2>
           <p className="text-sm text-[#94a3b8] leading-relaxed mb-4">
-            A diferencia del Sisbén, el RUI no depende de encuestas presenciales.
-            Funciona cruzando bases de datos oficiales para estimar la capacidad
+            El RUI parte de la base del Sisbén y la fortalece con registros
+            administrativos del Estado, sin exigirte una encuesta presencial
+            nueva. Cruza bases de datos oficiales para estimar la capacidad
             económica real del núcleo familiar. Entre las fuentes que el DNP ha
             mencionado están:
           </p>
@@ -116,7 +119,11 @@ export default function QueEsElRui() {
           </p>
         </section>
 
-        <CtaConsulta />
+        <CtaConsulta
+          titulo="Ya sabes qué es el RUI: consulta el tuyo"
+          texto="Ingresa tu documento y mira en qué grupo y subgrupo está tu hogar. Es gratis y no necesitas cuenta."
+          boton="Ver mi grupo en el RUI"
+        />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>

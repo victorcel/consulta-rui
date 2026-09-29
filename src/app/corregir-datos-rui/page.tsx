@@ -4,6 +4,7 @@ import { SiteShell } from '@/components/site-shell';
 import {
   AvisoNoOficial,
   Breadcrumb,
+  BotonVentanilla,
   CtaConsulta,
   EnlacesRelacionados,
   FechaActualizacion,
@@ -62,7 +63,7 @@ export default function CorregirDatosRui() {
           </h1>
           <p className="text-[#94a3b8] text-sm sm:text-base leading-relaxed">
             El RUI calcula tu clasificación cruzando bases de datos oficiales,
-            no mediante una encuesta que puedas corregir en el momento. Cuando
+            no con una encuesta nueva que puedas corregir en el momento. Cuando
             el resultado no representa tu situación real, existe una ruta para
             solicitar la revisión.
           </p>
@@ -103,6 +104,7 @@ export default function CorregirDatosRui() {
               </li>
             ))}
           </ol>
+          <BotonVentanilla texto="Solicitar la revisión en la Ventanilla Social" />
         </section>
 
         <section>
@@ -138,7 +140,11 @@ export default function CorregirDatosRui() {
           </p>
         </section>
 
-        <CtaConsulta />
+        <CtaConsulta
+          titulo="Confirma tu grupo actual antes de pedir la revisión"
+          texto="Consulta tu grupo y subgrupo hoy: así sabrás exactamente qué dato quieres corregir y qué código tienes que reclamar."
+          boton="Ver mi grupo actual"
+        />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>

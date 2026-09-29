@@ -173,7 +173,11 @@ export function PaginaGrupo({ grupo }: { grupo: GrupoRui }) {
           </div>
         </section>
 
-        <CtaConsulta />
+        <CtaConsulta
+          titulo={`¿Estás en el grupo ${grupo}? Compruébalo`}
+          texto={`Consulta tu código con tu documento: podrás ver si tu hogar está entre ${grupo}1 y ${grupo}${contenido.subgrupos} y qué subgrupo te corresponde.`}
+          boton="Consultar mi grupo"
+        />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>

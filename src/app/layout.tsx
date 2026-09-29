@@ -77,7 +77,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Consulta RUI - Registro Único de Ingreso",
+        alt: "Consulta RUI - Registro Universal de Ingresos",
       },
     ],
   },

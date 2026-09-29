@@ -37,13 +37,19 @@ export default function QuePasoConMiPuntajeSisben() {
           </p>
         </header>
 
+        <CtaConsulta
+          titulo="Consulta tu grupo actual en el RUI"
+          texto="Es lo que reemplazó al puntaje. Ingresa tu documento y ve tu grupo y subgrupo ahora."
+          boton="Ver mi grupo en el RUI"
+        />
+
         <section>
           <h2 className="text-xl sm:text-2xl font-bold text-[#e2e8f0] mb-3">
             El puntaje numérico ya no existe
           </h2>
           <p className="text-sm text-[#94a3b8] leading-relaxed">
-            El Sisbén IV asignaba un puntaje de 0 a 100 que determinaba el
-            grupo de un hogar. El RUI eliminó ese número: ahora la consulta
+            Hasta 2021 el Sisbén asignaba un puntaje de 0 a 100 que determinaba
+            el grupo de un hogar. El RUI eliminó ese número: ahora la consulta
             devuelve directamente un{' '}
             <strong className="text-[#cbd5e1]">
               código de grupo y subgrupo
@@ -60,11 +66,11 @@ export default function QuePasoConMiPuntajeSisben() {
             Por qué cambió
           </h2>
           <p className="text-sm text-[#94a3b8] leading-relaxed">
-            El DNP reemplazó la encuesta presencial del Sisbén por un cálculo
-            automático que cruza bases de datos oficiales —DIAN, servicios
+            El Sisbén evoluciona: el DNP conserva su base y la complementa con un
+            cálculo automático que cruza registros oficiales —DIAN, servicios
             públicos, fondos de pensiones, entidades financieras— para estimar
-            los ingresos reales de cada hogar sin depender de una visita ni de
-            la información que la persona reporte por su cuenta.
+            los ingresos reales de cada hogar sin exigir una visita nueva ni
+            depender solo de lo que la persona reporte por su cuenta.
           </p>
         </section>
 
@@ -127,7 +133,6 @@ export default function QuePasoConMiPuntajeSisben() {
           </p>
         </section>
 
-        <CtaConsulta />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>

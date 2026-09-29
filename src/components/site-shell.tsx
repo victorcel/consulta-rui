@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Shield } from 'lucide-react';
+import { PAGINAS } from '@/lib/site';
 
 /**
  * Marco visual compartido por las páginas de contenido (fondo, header y footer).
@@ -34,26 +35,62 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </div>
           </Link>
         </div>
+        <nav
+          aria-label="Menú principal"
+          className="max-w-3xl mx-auto mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-[#94a3b8]"
+        >
+          {[
+            ['/', 'Consultar RUI'],
+            ['/clasificacion-rui', 'Grupos'],
+            ['/subsidios-rui', 'Subsidios'],
+            ['/certificado-rui', 'Certificado'],
+            ['/corregir-datos-rui', 'Corregir datos'],
+          ].map(([href, texto]) => (
+            <Link key={href} href={href} className="hover:text-[#22d3ee] transition-colors">
+              {texto}
+            </Link>
+          ))}
+        </nav>
       </header>
 
       <main className="flex-1 flex flex-col items-center px-4 sm:px-6 pb-8">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto py-4 px-4 border-t border-[#1e293b]/50">
-        <div className="max-w-3xl mx-auto flex items-center justify-center gap-1.5 text-xs text-[#475569]">
-          <span>Desarrollado por</span>
-          <a
-            href="https://col0.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
-          >
-            www.col0.com
-          </a>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
+  );
+}
+
+/** Pie compartido: enlaces a las páginas de contenido (no a las de cada grupo) y crédito. */
+export function SiteFooter() {
+  return (
+    <footer className="mt-auto py-6 px-4 border-t border-[#1e293b]/50">
+      <nav
+        aria-label="Páginas del sitio"
+        className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-[#94a3b8] mb-4"
+      >
+        {PAGINAS.filter((p) => !p.slug.startsWith('grupo-')).map((p) => (
+          <Link
+            key={p.slug}
+            href={`/${p.slug}`}
+            className="hover:text-[#22d3ee] transition-colors"
+          >
+            {p.titulo}
+          </Link>
+        ))}
+      </nav>
+      <div className="max-w-3xl mx-auto flex items-center justify-center gap-1.5 text-xs text-[#475569]">
+        <span>Desarrollado por</span>
+        <a
+          href="https://col0.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+        >
+          www.col0.com
+        </a>
+      </div>
+    </footer>
   );
 }

@@ -23,7 +23,7 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
     contexto:
       'El grupo A es el primero de la escala del RUI y agrupa a los hogares con los ingresos más bajos del país. Se divide en cinco subgrupos, de A1 a A5, donde A1 corresponde a la situación de mayor precariedad económica.',
     implicaciones:
-      'Pertenecer al grupo A implica la mayor prioridad en la asignación de programas sociales. En la práctica, es el grupo que concentra los mayores porcentajes de subsidio y el que suele quedar cubierto primero cuando un programa tiene cupos limitados.',
+      'Pertenecer al grupo A implica la mayor prioridad en la asignación de programas sociales. En la práctica, es el grupo que suele quedar cubierto primero cuando un programa tiene cupos limitados y, en varios programas, el que accede a los montos más altos.',
     duda: {
       pregunta: '¿El grupo A garantiza recibir todos los subsidios?',
       respuesta:
@@ -41,7 +41,7 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
     contexto:
       'El grupo B corresponde a hogares en condición de pobreza, con ingresos algo superiores a los del grupo A. Se divide en siete subgrupos, de B1 a B7, y se ubica en la escala entre la pobreza extrema (grupo A) y la vulnerabilidad (grupo C).',
     implicaciones:
-      'Los hogares del grupo B mantienen acceso prioritario a la mayoría de programas sociales. Frente al grupo A, la diferencia suele estar en el porcentaje del subsidio más que en la elegibilidad: se accede a los mismos programas, con montos o coberturas algo menores.',
+      'Los hogares del grupo B mantienen acceso prioritario a la mayoría de programas sociales. Frente al grupo A, la diferencia suele estar en la prioridad de asignación más que en la elegibilidad: se accede a los mismos programas principales, y solo algunos gradúan el monto según el subgrupo.',
     duda: {
       pregunta: '¿Cuál es la diferencia real entre el grupo A y el B?',
       respuesta:
@@ -69,7 +69,7 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
       primero:
         'C1 conserva condiciones parecidas a las del grupo B: suele mantener acceso a Colombia Mayor y a copagos reducidos en salud.',
       ultimo:
-        'C18 es el subgrupo más consultado del grupo C: se acerca a las condiciones del grupo D y su acceso a subsidios directos es limitado, aunque puede mantener prioridad en programas educativos y de vivienda según la entidad.',
+        'C18 es el último subgrupo del grupo C: se acerca a las condiciones del grupo D y su acceso a subsidios directos es limitado, aunque puede mantener prioridad en programas educativos y de vivienda según la entidad.',
     },
   },
   D: {
@@ -85,7 +85,7 @@ export const CONTENIDO_POR_GRUPO: Record<GrupoRui, ContenidoGrupo> = {
     },
     extremos: {
       primero:
-        'D1 conserva algo de cercanía con la vulnerabilidad del grupo C, por lo que en algunos municipios puede acceder a beneficios educativos focalizados.',
+        'D1 conserva algo de cercanía con la vulnerabilidad del grupo C, por lo que puede acceder a algunos beneficios que no dependen del nivel de pobreza, como ciertos apoyos educativos, según la entidad.',
       ultimo:
         'D21 es el subgrupo con menor prioridad de todo el RUI: corresponde a los hogares con mayor capacidad económica dentro de la escala del sistema.',
     },

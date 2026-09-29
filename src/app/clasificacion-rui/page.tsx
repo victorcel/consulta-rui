@@ -156,7 +156,11 @@ export default function ClasificacionRui() {
           </p>
         </section>
 
-        <CtaConsulta />
+        <CtaConsulta
+          titulo="¿Cuál es tu código en el RUI?"
+          texto="Consulta tu grupo y subgrupo con tu documento y vuelve aquí para entender qué significa cada letra y número."
+          boton="Consultar mi código"
+        />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>

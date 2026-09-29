@@ -28,6 +28,7 @@ import { detectarNivelRui, type NivelRuiInfo } from '@/lib/rui-niveles';
 import { CAMPO_NIVEL_RUI_EXACTO, CAMPO_NIVEL_RUI_AMPLIO } from '@/lib/rui-fields';
 import { FAQ_RUI } from '@/lib/rui-faq';
 import { PAGINAS } from '@/lib/site';
+import { SiteFooter } from '@/components/site-shell';
 import { homeJsonLd } from '@/lib/home-schema';
 
 // Resumen de los cuatro grupos del RUI. Se muestra como contenido indexable:
@@ -68,11 +69,11 @@ const DOCUMENT_TYPES = [
   { value: '2', label: 'Tarjeta de identidad' },
   { value: '1', label: 'Registro civil' },
   { value: '4', label: 'Cédula de extranjería' },
-  { value: '5', label: 'DNI (País de origen)' },
-  { value: '6', label: 'DNI (Pasaporte)' },
-  { value: '7', label: 'Salvoconducto refugiado' },
-  { value: '8', label: 'Permiso especial permanencia' },
-  { value: '9', label: 'Permiso Protección Temporal' },
+  { value: '5', label: 'Documento del país de origen (DNI)' },
+  { value: '6', label: 'Pasaporte' },
+  { value: '7', label: 'Salvoconducto de refugiado' },
+  { value: '8', label: 'PEP – Permiso Especial de Permanencia' },
+  { value: '9', label: 'PPT – Permiso por Protección Temporal' },
 ];
 
 interface RUIField {
@@ -105,7 +106,6 @@ export default function Home() {
   const [docType, setDocType] = useState('3');
   const [docNumber, setDocNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [resultHtml, setResultHtml] = useState<string | null>(null);
   const [parsedFields, setParsedFields] = useState<RUIField[]>([]);
   const [nivelInfo, setNivelInfo] = useState<NivelRuiInfo | null>(null);
   const [hasError, setHasError] = useState(false);
@@ -271,7 +271,6 @@ export default function Home() {
       }
 
       setIsLoading(true);
-      setResultHtml(null);
       setParsedFields([]);
       setNivelInfo(null);
       setHasError(false);
@@ -288,14 +287,12 @@ export default function Home() {
         });
 
         const text = await response.text();
-        setResultHtml(text);
-
         if (!response.ok) {
           setHasError(true);
           setIsResultOpen(true);
           toast({
-            title: 'Error en la consulta',
-            description: 'No se pudo obtener la información. Verifica tus datos e intenta de nuevo.',
+            title: 'No pudimos completar la consulta',
+            description: 'Puede ser una falla temporal del servicio o un dato mal escrito. Revisa e intenta de nuevo.',
             variant: 'destructive',
           });
           return;
@@ -321,7 +318,7 @@ export default function Home() {
         if (fields.length === 0) {
           toast({
             title: 'Sin resultados',
-            description: 'No se encontró información para el documento consultado.',
+            description: 'No encontramos información para este documento.',
           });
         }
       } catch {
@@ -329,7 +326,7 @@ export default function Home() {
         setIsResultOpen(true);
         toast({
           title: 'Error de conexión',
-          description: 'No se pudo conectar con el servicio. Intente nuevamente más tarde.',
+          description: 'No pudimos conectar con el servicio. Intenta de nuevo en unos minutos.',
           variant: 'destructive',
         });
       } finally {
@@ -386,7 +383,7 @@ export default function Home() {
         <section className="max-w-2xl mx-auto text-center mt-6 sm:mt-10 mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#22d3ee] text-xs font-medium mb-5">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            Consulta gratuita · Datos del DNP
+            Gratis · Sin cuenta · Datos del DNP
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#e2e8f0] mb-4 leading-tight">
             Consultar RUI por cédula:{' '}
@@ -395,25 +392,25 @@ export default function Home() {
             </span>
           </h2>
           <p className="text-[#94a3b8] text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
-            Consulta en línea y gratis tu grupo y clasificación en el RUI, el
-            registro del DNP que desde agosto de 2026 reemplaza al Sisbén para
-            focalizar los programas sociales. Ingresa tu documento y obtén el
-            resultado en menos de tres minutos.
+            El Sisbén ya no muestra puntaje: desde agosto de 2026 lo reemplaza
+            el RUI. Consulta gratis tu grupo con tu documento y entiende qué
+            significa para tus subsidios. La transición termina el 31 de
+            octubre de 2026.
           </p>
         </section>
 
         {/* Form Card */}
-        <section className="w-full max-w-md mx-auto mb-8">
+        <section id="consulta" className="w-full max-w-md mx-auto mb-8 scroll-mt-6">
           <Card className="bg-[#0c1120]/80 backdrop-blur-sm border-[#1e293b] shadow-2xl shadow-black/20">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2 mb-1">
                 <FileText className="w-4 h-4 text-[#06b6d4]" />
                 <CardTitle className="text-base text-[#e2e8f0]">
-                  Datos de consulta
+                  Consulta tu grupo en el RUI
                 </CardTitle>
               </div>
               <CardDescription className="text-[#94a3b8] text-sm">
-                Selecciona el tipo e ingresa tu número de documento
+                Escribe tu documento sin puntos ni comas
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -447,7 +444,7 @@ export default function Home() {
                   <Input
                     id="docNumber"
                     type="text"
-                    placeholder="Ingresa tu número de documento"
+                    placeholder="Ej. 1012345678"
                     value={docNumber}
                     onChange={(e) => {
                       const val = e.target.value.replace(/\D/g, '').slice(0, 15);
@@ -478,6 +475,11 @@ export default function Home() {
                     </>
                   )}
                 </Button>
+                {!turnstileToken && !isLoading && (
+                  <p className="text-xs text-[#64748b] text-center">
+                    Completa la verificación de seguridad para activar el botón.
+                  </p>
+                )}
               </form>
             </CardContent>
           </Card>
@@ -486,19 +488,23 @@ export default function Home() {
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6">
             <div className="flex items-center gap-2 text-[#94a3b8] text-xs">
               <Lock className="w-3.5 h-3.5 text-[#06b6d4]/60" />
-              <span>Tus datos están protegidos</span>
+              <span>Sin cuenta ni costo</span>
             </div>
             <div className="hidden sm:block w-1 h-1 rounded-full bg-[#1e293b]" />
             <div className="flex items-center gap-2 text-[#94a3b8] text-xs">
               <Shield className="w-3.5 h-3.5 text-[#06b6d4]/60" />
-              <span>Conexión segura</span>
+              <span>Resultado del DNP</span>
             </div>
             <div className="hidden sm:block w-1 h-1 rounded-full bg-[#1e293b]" />
             <div className="flex items-center gap-2 text-[#94a3b8] text-xs">
               <UserCheck className="w-3.5 h-3.5 text-[#06b6d4]/60" />
-              <span>Consulta gratuita</span>
+              <span>Sitio independiente</span>
             </div>
           </div>
+          <p className="mt-3 text-center text-xs text-[#64748b] leading-relaxed">
+            No somos un portal oficial ni estamos afiliados al DNP. Consultar el
+            RUI es gratis: no pagues a intermediarios.
+          </p>
         </section>
 
         {/* Contenido informativo (SEO): texto indexable sobre qué es el RUI,
@@ -517,11 +523,11 @@ export default function Home() {
                 para orientar el gasto social del Estado.
               </p>
               <p>
-                A diferencia del Sisbén, el RUI no se basa en encuestas
-                presenciales: calcula la clasificación cruzando bases de datos
-                oficiales como las de la DIAN, empresas de servicios públicos,
-                fondos de pensiones y entidades financieras. Por eso la
-                información se actualiza sin que tengas que solicitar una visita.
+                El RUI parte de la base del Sisbén y la fortalece con registros
+                administrativos: cruza bases de datos oficiales como las de la
+                DIAN, empresas de servicios públicos, fondos de pensiones y
+                entidades financieras. Por eso la información se actualiza sin
+                que tengas que pedir una encuesta nueva.
               </p>
             </div>
           </section>
@@ -531,7 +537,7 @@ export default function Home() {
               Cómo consultar el RUI por cédula
             </h2>
             <p className="text-sm text-[#94a3b8] leading-relaxed mb-4">
-              La consulta del RUI es gratuita, toma menos de tres minutos y no
+              La consulta del RUI es gratuita, toma solo un momento y no
               requiere crear una cuenta. Sigue estos pasos:
             </p>
             <ol className="space-y-3">
@@ -549,6 +555,16 @@ export default function Home() {
                 </li>
               ))}
             </ol>
+            <p className="text-sm text-[#94a3b8] leading-relaxed mt-4">
+              ¿Necesitas un soporte para un trámite?{' '}
+              <Link
+                href="/certificado-rui"
+                className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+              >
+                Aprende a descargar el certificado del RUI en PDF
+              </Link>
+              .
+            </p>
           </section>
 
           <section>
@@ -563,9 +579,10 @@ export default function Home() {
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {GRUPOS_RUI.map((grupo) => (
-                <div
+                <Link
                   key={grupo.codigo}
-                  className={`rounded-lg border bg-[#0c1120]/60 p-4 ${grupo.colorClass}`}
+                  href={`/grupo-${grupo.codigo.toLowerCase()}-rui`}
+                  className={`block rounded-lg border bg-[#0c1120]/60 p-4 hover:bg-[#0c1120] transition-colors ${grupo.colorClass}`}
                 >
                   <h3 className="flex items-center gap-2 mb-1.5">
                     <Badge
@@ -576,12 +593,25 @@ export default function Home() {
                     </Badge>
                     <span className="text-sm font-semibold">{grupo.titulo}</span>
                   </h3>
-                  <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  <p className="text-xs text-[#94a3b8] leading-relaxed mb-2">
                     {grupo.resumen}
                   </p>
-                </div>
+                  <span className="text-xs font-medium text-[#06b6d4]">
+                    Ver el grupo {grupo.codigo} →
+                  </span>
+                </Link>
               ))}
             </div>
+            <p className="text-xs text-[#94a3b8] leading-relaxed mt-4">
+              ¿Quieres entender cada código?{' '}
+              <Link
+                href="/clasificacion-rui"
+                className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+              >
+                Lee la guía completa de grupos y subgrupos
+              </Link>
+              .
+            </p>
           </section>
 
           <section>
@@ -593,12 +623,29 @@ export default function Home() {
                 El RUI reemplaza al Sisbén como instrumento principal de
                 focalización del gasto social. Durante la transición, vigente
                 hasta el 31 de octubre de 2026, el Sisbén sigue siendo una de las
-                fuentes de información sobre las condiciones de los hogares.
+                fuentes de información sobre las condiciones de los hogares: no
+                desaparece, evoluciona.
               </p>
               <p>
                 Estar clasificado en el RUI no otorga subsidios de forma
                 automática: el registro clasifica hogares y cada programa social
                 define sus propios requisitos de acceso sobre esa clasificación.
+              </p>
+              <p>
+                <Link
+                  href="/rui-vs-sisben"
+                  className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+                >
+                  Compara el RUI y el Sisbén
+                </Link>{' '}
+                o revisa{' '}
+                <Link
+                  href="/que-paso-con-mi-puntaje-sisben"
+                  className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
+                >
+                  qué pasó con tu puntaje del Sisbén
+                </Link>
+                .
               </p>
             </div>
           </section>
@@ -619,6 +666,14 @@ export default function Home() {
                   <p className="text-sm text-[#94a3b8] leading-relaxed">
                     {item.respuesta}
                   </p>
+                  {item.enlace && (
+                    <Link
+                      href={item.enlace.href}
+                      className="inline-block mt-2 text-xs font-medium text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+                    >
+                      {item.enlace.texto} →
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>
@@ -679,10 +734,10 @@ export default function Home() {
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2 text-base text-[#e2e8f0]">
                     <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    Resultado de la consulta
+                    {nivelInfo ? `Tu grupo en el RUI: ${nivelInfo.codigo}` : 'Resultado de la consulta'}
                   </DialogTitle>
                   <DialogDescription className="text-[#94a3b8]">
-                    Información encontrada en el Registro Universal de Ingresos
+                    Esto es lo que encontramos en el Registro Universal de Ingresos
                   </DialogDescription>
                 </DialogHeader>
                 {nivelInfo && (
@@ -738,25 +793,65 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
+
+                <div>
+                  <p className="text-xs font-medium text-[#e2e8f0] mb-2">¿Y ahora qué?</p>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {[
+                      nivelInfo && {
+                        href: `/grupo-${nivelInfo.grupo.toLowerCase()}-rui`,
+                        texto: `Qué significa estar en el grupo ${nivelInfo.grupo}`,
+                      },
+                      { href: '/subsidios-rui', texto: 'Ver subsidios según tu grupo' },
+                      { href: '/certificado-rui', texto: 'Descargar el certificado en PDF' },
+                      { href: '/corregir-datos-rui', texto: 'Mi grupo no coincide con mi situación' },
+                    ]
+                      .filter((e): e is { href: string; texto: string } => !!e)
+                      .map((enlace) => (
+                        <Link
+                          key={enlace.href}
+                          href={enlace.href}
+                          className="rounded-lg border border-[#1e293b] bg-[#111827]/60 px-3 py-2.5 text-xs font-medium text-[#22d3ee] hover:border-[#06b6d4]/30 transition-colors"
+                        >
+                          {enlace.texto} →
+                        </Link>
+                      ))}
+                  </div>
+                </div>
               </>
             ) : hasError ? (
               <>
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2 text-base text-[#e2e8f0]">
                     <AlertCircle className="w-5 h-5 text-red-400" />
-                    Respuesta del servicio
+                    No pudimos completar la consulta
                   </DialogTitle>
                   <DialogDescription className="text-[#94a3b8]">
-                    El servicio devolvió la siguiente respuesta
+                    Puede ser una falla temporal del servicio del DNP o un dato mal escrito.
                   </DialogDescription>
                 </DialogHeader>
-                {resultHtml && (
-                  <div className="rounded-lg border border-[#1e293b] bg-[#111827] p-4 max-h-96 overflow-y-auto">
-                    <pre className="text-xs text-[#94a3b8] whitespace-pre-wrap break-words font-mono">
-                      {resultHtml}
-                    </pre>
-                  </div>
-                )}
+                <ul className="space-y-2 text-sm text-[#94a3b8] leading-relaxed">
+                  <li>• Revisa que el tipo y el número de documento sean correctos.</li>
+                  <li>• Intenta de nuevo en unos minutos: el servicio se satura en horas de alta demanda.</li>
+                  <li>• Si sigue fallando, consúltalo directamente en la Ventanilla Social.</li>
+                </ul>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => setIsResultOpen(false)}
+                    className="text-white bg-gradient-to-r from-[#06b6d4] to-[#0891b2] cursor-pointer"
+                  >
+                    Intentar de nuevo
+                  </Button>
+                  <a
+                    href="https://ventanillasocial.dnp.gov.co/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium text-[#22d3ee] border border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-colors"
+                  >
+                    Ir a la Ventanilla Social
+                  </a>
+                </div>
               </>
             ) : (
               <>
@@ -766,29 +861,38 @@ export default function Home() {
                     Sin resultados
                   </DialogTitle>
                   <DialogDescription className="text-[#94a3b8]">
-                    No se encontró información para el documento consultado.
+                    No encontramos información para este documento.
                   </DialogDescription>
                 </DialogHeader>
+                <ul className="space-y-2 text-sm text-[#94a3b8] leading-relaxed">
+                  <li>• Confirma que elegiste el tipo de documento correcto y que el número no tiene errores.</li>
+                  <li>• Puede que tu clasificación aún no se haya calculado: el RUI se actualiza de forma periódica.</li>
+                  <li>
+                    • Si crees que deberías aparecer, consulta en la{' '}
+                    <a
+                      href="https://ventanillasocial.dnp.gov.co/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#06b6d4] hover:text-[#22d3ee] font-medium"
+                    >
+                      Ventanilla Social
+                    </a>{' '}
+                    o en la oficina del Sisbén de tu municipio.
+                  </li>
+                </ul>
+                <Link
+                  href="/corregir-datos-rui"
+                  className="text-xs font-medium text-[#22d3ee] hover:underline"
+                >
+                  Qué hacer si tus datos no aparecen o están mal →
+                </Link>
               </>
             )}
           </DialogContent>
         </Dialog>
       </main>
 
-      {/* Footer - sticky to bottom */}
-      <footer className="mt-auto py-4 px-4 border-t border-[#1e293b]/50">
-        <div className="max-w-3xl mx-auto flex items-center justify-center gap-1.5 text-xs text-[#475569]">
-          <span>Desarrollado por</span>
-          <a
-            href="https://col0.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
-          >
-            www.col0.com
-          </a>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

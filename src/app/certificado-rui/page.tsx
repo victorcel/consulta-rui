@@ -3,6 +3,7 @@ import { SiteShell } from '@/components/site-shell';
 import {
   AvisoNoOficial,
   Breadcrumb,
+  BotonVentanilla,
   CtaConsulta,
   EnlacesRelacionados,
   FechaActualizacion,
@@ -61,6 +62,7 @@ export default function CertificadoRui() {
               </li>
             ))}
           </ol>
+          <BotonVentanilla texto="Descargar mi certificado en la Ventanilla Social" />
         </section>
 
         <section>
@@ -113,7 +115,11 @@ export default function CertificadoRui() {
           </p>
         </section>
 
-        <CtaConsulta />
+        <CtaConsulta
+          titulo="Antes del certificado, conoce tu grupo"
+          texto="Consulta tu grupo y subgrupo aquí y entiende qué significa. Después descarga el certificado oficial si tu trámite lo pide."
+          boton="Ver mi grupo en el RUI"
+        />
         <EnlacesRelacionados enlaces={paginasRelacionadas(slug)} />
         <AvisoNoOficial />
       </article>
