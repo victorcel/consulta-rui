@@ -30,7 +30,9 @@ const PROXY_POOL_URL =
 
 const PROXY_SEED = ['186.33.57.213:999', '200.10.28.13:999'];
 
-let proxyPool = [];
+let proxyPool = [...PROXY_SEED];
+// Proxies que respondieron bien hace poco: se prueban junto al pool y se descartan al fallar.
+const goodProxies = new Set();
 let proxyPoolFetchedAt = 0;
 
 async function refreshProxyPool() {
@@ -199,13 +201,23 @@ async function consultarDNP(body, contentType) {
   if (Date.now() - proxyPoolFetchedAt > 5 * 60 * 1000 || proxyPool.length === 0) {
     await refreshProxyPool();
   }
-  const pool = proxyPool.slice(0, 16);
+  // Todo el pool (~20% de los proxies gratuitos responde, y cambian a cada rato).
+  const pool = [...new Set([...goodProxies, ...proxyPool])];
 
   const viaProxy = pool.map((px) => {
     const [host, port] = px.split(':');
     return requestViaProxy(host, port, body, contentType)
       .then(completarRespuesta)
-      .then((r) => ({ ok: true, ...r }));
+      .then((r) => {
+        // Un proxy que devuelve error/basura no debe ganar la carrera.
+        if (r.status !== 200 || !r.body) throw new Error('respuesta inválida: ' + r.status);
+        goodProxies.add(px);
+        return { ok: true, ...r };
+      })
+      .catch((err) => {
+        goodProxies.delete(px);
+        throw err;
+      });
   });
 
   const resultados = await Promise.any([directo, ...viaProxy]).catch(
