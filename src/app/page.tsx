@@ -124,6 +124,10 @@ export default function Home() {
   );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetIdRef = useRef<string | null>(null);
+  // Analítica: embudo de la sesión (nunca incluye el número de documento).
+  const consultasRef = useRef(0);
+  const inicioRef = useRef(false);
+  const turnstileDesdeRef = useRef(Date.now());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -159,8 +163,14 @@ export default function Home() {
         sitekey: siteKey,
         theme: 'dark',
         language: 'es',
-        callback: (token: string) => setTurnstileToken(token),
+        callback: (token: string) => {
+          setTurnstileToken(token);
+          track('verificacion_ok', {
+            segundos: Math.round((Date.now() - turnstileDesdeRef.current) / 1000),
+          });
+        },
         'expired-callback': () => {
+          track('verificacion_expirada');
           setTurnstileToken(null);
           toast({
             title: 'Verificación expirada',
@@ -168,7 +178,8 @@ export default function Home() {
             variant: 'destructive',
           });
         },
-        'error-callback': () => {
+        'error-callback': (codigo?: string) => {
+          track('verificacion_error', { codigo: String(codigo ?? 'desconocido') });
           setTurnstileToken(null);
           toast({
             title: 'Error de verificación',
@@ -245,6 +256,7 @@ export default function Home() {
       e.preventDefault();
 
       if (!docNumber.trim()) {
+        track('consulta_bloqueada', { motivo: 'sin_documento' });
         toast({
           title: 'Campo requerido',
           description: 'Por favor ingresa tu número de documento.',
@@ -254,7 +266,7 @@ export default function Home() {
       }
 
       if (!/^\d{1,15}$/.test(docNumber.trim())) {
-        track('consulta_invalida', { tipo_doc: docType });
+        track('consulta_bloqueada', { motivo: 'documento_invalido', tipo_doc: docType });
         toast({
           title: 'Número inválido',
           description: 'El número de documento debe contener solo dígitos (máximo 15).',
@@ -264,6 +276,7 @@ export default function Home() {
       }
 
       if (!turnstileToken) {
+        track('consulta_bloqueada', { motivo: 'sin_verificacion' });
         toast({
           title: 'Verificación requerida',
           description: 'Por favor completa la verificación de seguridad antes de continuar.',
@@ -272,7 +285,9 @@ export default function Home() {
         return;
       }
 
-      track('consulta_enviada', { tipo_doc: docType });
+      const intento = ++consultasRef.current;
+      const t0 = Date.now();
+      track('consulta_enviada', { tipo_doc: docType, intento });
       setIsLoading(true);
       setParsedFields([]);
       setNivelInfo(null);
@@ -291,7 +306,7 @@ export default function Home() {
 
         const text = await response.text();
         if (!response.ok) {
-          track('consulta_error', { status: response.status });
+          track('consulta_error', { status: response.status, intento, duracion_ms: Date.now() - t0 });
           setHasError(true);
           setIsResultOpen(true);
           toast({
@@ -320,7 +335,14 @@ export default function Home() {
         setNivelInfo(nivel);
         track(
           fields.length === 0 ? 'consulta_sin_resultados' : 'consulta_exitosa',
-          { grupo: nivel?.grupo ?? 'desconocido' }
+          {
+            grupo: nivel?.grupo ?? 'desconocido',
+            codigo: nivel?.codigo ?? 'desconocido',
+            campos: fields.length,
+            tipo_doc: docType,
+            intento,
+            duracion_ms: Date.now() - t0,
+          }
         );
 
         if (fields.length === 0) {
@@ -330,7 +352,7 @@ export default function Home() {
           });
         }
       } catch {
-        track('consulta_error', { status: 0 });
+        track('consulta_error', { status: 0, intento, duracion_ms: Date.now() - t0 });
         setHasError(true);
         setIsResultOpen(true);
         toast({
@@ -343,6 +365,7 @@ export default function Home() {
         if (turnstileWidgetIdRef.current && window.turnstile) {
           window.turnstile.reset(turnstileWidgetIdRef.current);
         }
+        turnstileDesdeRef.current = Date.now();
         setTurnstileToken(null);
       }
     },
@@ -455,6 +478,11 @@ export default function Home() {
                     type="text"
                     placeholder="Ej. 1012345678"
                     value={docNumber}
+                    onFocus={() => {
+                      if (inicioRef.current) return;
+                      inicioRef.current = true;
+                      track('consulta_iniciada');
+                    }}
                     onChange={(e) => {
                       const val = e.target.value.replace(/\D/g, '').slice(0, 15);
                       setDocNumber(val);
@@ -821,6 +849,12 @@ export default function Home() {
                         <Link
                           key={enlace.href}
                           href={enlace.href}
+                          onClick={() =>
+                            track('click_siguiente_paso', {
+                              destino: enlace.href,
+                              grupo: nivelInfo?.grupo ?? 'desconocido',
+                            })
+                          }
                           className="rounded-lg border border-[#1e293b] bg-[#111827]/60 px-3 py-2.5 text-xs font-medium text-[#22d3ee] hover:border-[#06b6d4]/30 transition-colors"
                         >
                           {enlace.texto} →
@@ -848,7 +882,10 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     type="button"
-                    onClick={() => setIsResultOpen(false)}
+                    onClick={() => {
+                      track('click_reintentar');
+                      setIsResultOpen(false);
+                    }}
                     className="text-white bg-gradient-to-r from-[#06b6d4] to-[#0891b2] cursor-pointer"
                   >
                     Intentar de nuevo
