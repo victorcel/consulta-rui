@@ -25,6 +25,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { detectarNivelRui, type NivelRuiInfo } from '@/lib/rui-niveles';
+import { track } from '@/lib/analytics';
 import { CAMPO_NIVEL_RUI_EXACTO, CAMPO_NIVEL_RUI_AMPLIO } from '@/lib/rui-fields';
 import { FAQ_RUI } from '@/lib/rui-faq';
 import { PAGINAS } from '@/lib/site';
@@ -253,6 +254,7 @@ export default function Home() {
       }
 
       if (!/^\d{1,15}$/.test(docNumber.trim())) {
+        track('consulta_invalida', { tipo_doc: docType });
         toast({
           title: 'Número inválido',
           description: 'El número de documento debe contener solo dígitos (máximo 15).',
@@ -270,6 +272,7 @@ export default function Home() {
         return;
       }
 
+      track('consulta_enviada', { tipo_doc: docType });
       setIsLoading(true);
       setParsedFields([]);
       setNivelInfo(null);
@@ -288,6 +291,7 @@ export default function Home() {
 
         const text = await response.text();
         if (!response.ok) {
+          track('consulta_error', { status: response.status });
           setHasError(true);
           setIsResultOpen(true);
           toast({
@@ -314,6 +318,10 @@ export default function Home() {
           detectarNivelRui(text) ||
           null;
         setNivelInfo(nivel);
+        track(
+          fields.length === 0 ? 'consulta_sin_resultados' : 'consulta_exitosa',
+          { grupo: nivel?.grupo ?? 'desconocido' }
+        );
 
         if (fields.length === 0) {
           toast({
@@ -322,6 +330,7 @@ export default function Home() {
           });
         }
       } catch {
+        track('consulta_error', { status: 0 });
         setHasError(true);
         setIsResultOpen(true);
         toast({
@@ -715,6 +724,7 @@ export default function Home() {
               en el portal oficial de la Ventanilla Social del DNP:{' '}
               <a
                 href="https://ventanillasocial.dnp.gov.co/"
+                data-umami-event="click_ventanilla_social"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
@@ -845,6 +855,7 @@ export default function Home() {
                   </Button>
                   <a
                     href="https://ventanillasocial.dnp.gov.co/"
+                    data-umami-event="click_ventanilla_social"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center h-9 px-4 rounded-md text-sm font-medium text-[#22d3ee] border border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-colors"
@@ -871,6 +882,7 @@ export default function Home() {
                     • Si crees que deberías aparecer, consulta en la{' '}
                     <a
                       href="https://ventanillasocial.dnp.gov.co/"
+                      data-umami-event="click_ventanilla_social"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#06b6d4] hover:text-[#22d3ee] font-medium"

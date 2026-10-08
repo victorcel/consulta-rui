@@ -97,6 +97,7 @@ export function BotonVentanilla({ texto = 'Ir a la Ventanilla Social' }: { texto
   return (
     <a
       href={URL_VENTANILLA}
+      data-umami-event="click_ventanilla_social"
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-md text-sm font-semibold text-[#22d3ee] border border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-colors mt-4"
@@ -123,6 +124,7 @@ export function CtaConsulta({
       <p className="text-sm text-[#94a3b8] leading-relaxed mb-4">{texto}</p>
       <Link
         href="/#consulta"
+        data-umami-event="click_cta_consultar"
         className="inline-flex items-center justify-center h-11 px-6 rounded-md text-sm font-semibold text-white bg-gradient-to-r from-[#06b6d4] to-[#0891b2] hover:from-[#22d3ee] hover:to-[#06b6d4] shadow-lg shadow-[#06b6d4]/20 hover:shadow-[#06b6d4]/30 transition-all duration-300"
       >
         <Search className="w-4 h-4 mr-2" />
@@ -149,6 +151,7 @@ export function AvisoNoOficial() {
         portal oficial de la Ventanilla Social del DNP:{' '}
         <a
           href="https://ventanillasocial.dnp.gov.co/"
+          data-umami-event="click_ventanilla_social"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[#06b6d4] hover:text-[#22d3ee] transition-colors font-medium"
